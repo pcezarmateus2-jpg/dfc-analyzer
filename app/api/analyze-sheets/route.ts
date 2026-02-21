@@ -8,8 +8,16 @@ interface LinhaSheet {
 
 // Função para extrair ID da planilha do Google Sheets
 function extrairSheetId(url: string): string | null {
-  const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  // Remover parâmetros da URL
+  const urlLimpa = url.split('?')[0].split('#')[0];
+  const match = urlLimpa.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
   return match ? match[1] : null;
+}
+
+// Função para extrair GID (ID da aba) se houver
+function extrairGid(url: string): string {
+  const match = url.match(/[?&#]gid=([0-9]+)/);
+  return match ? match[1] : '0';
 }
 
 // Função para buscar dados do Google Sheets via CSV export
@@ -20,8 +28,10 @@ async function buscarDadosSheet(url: string): Promise<LinhaSheet[]> {
     throw new Error('URL inválida do Google Sheets');
   }
   
-  // URL para exportar como CSV (primeira aba)
-  const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+  const gid = extrairGid(url);
+  
+  // URL para exportar como CSV (aba específica)
+  const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
   
   try {
     const response = await fetch(csvUrl);
