@@ -1,75 +1,33 @@
-# 💼 DFC Analyzer - Análise Financeira Inteligente
+# 💼 DFC Analyzer
 
-Sistema web para análise de Demonstrativo de Fluxo de Caixa (DFC) com análise inteligente automática e gráficos.
+Sistema de análise de Demonstrativo de Fluxo de Caixa com IA.
 
-## ✨ Funcionalidades
+## 🚀 Deploy
 
-- 📄 Upload de PDFs (contas a pagar e receber)
-- 📊 Geração automática de DFC
-- 🤖 Análise inteligente (sem necessidade de API externa)
-- 📈 Gráficos interativos
-- 💡 Recomendações personalizadas
-- 📱 Interface responsiva
-
-## 🚀 Deploy no Vercel (GRÁTIS)
-
-### Método Rápido:
-
-1. Suba para o GitHub
-2. Acesse: https://vercel.com
-3. Import Project
-4. Deploy!
-
-**Pronto! Seu sistema estará online em ~2 minutos**
-
-## 💻 Rodar Localmente
-
-```bash
-# Instalar dependências
-npm install
-
-# Rodar em desenvolvimento
-npm run dev
-
-# Acessar
-http://localhost:3060
-```
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/pcezarmateus2-jpg/dfc-analyzer)
 
 ## 📦 Tecnologias
 
-- Next.js 14
+- Next.js 14 (App Router)
 - React 18
-- TailwindCSS
-- Recharts (gráficos)
 - TypeScript
+- TailwindCSS
+- pdf-parse
+- Recharts
 
-## 🎯 Como Usar
+## 💻 Desenvolvimento Local
 
-1. Acesse o sistema
-2. Faça upload dos PDFs (contas a pagar e receber)
-3. Clique em "Analisar e Gerar DFC"
-4. Veja o DFC, gráficos e análise inteligente
+```bash
+npm install
+npm run dev
+```
 
-## 📊 Análise Inteligente
+Acesse: http://localhost:3060
 
-O sistema analisa automaticamente:
-- Saúde financeira
-- Margem de lucro
-- Distribuição de receitas e despesas
+## 📄 Funcionalidades
+
+- Upload de PDFs (contas a pagar/receber)
+- Extração automática de dados
+- Análise financeira inteligente
+- Gráficos interativos
 - Recomendações personalizadas
-- Projeções futuras
-- Indicadores-chave
-
-**Sem necessidade de API externa ou custos adicionais!**
-
-## 🌐 Deploy
-
-Sistema otimizado para Vercel:
-- Build automático
-- Deploy em segundos
-- 100% gratuito
-- HTTPS incluído
-
----
-
-**Desenvolvido para facilitar a gestão financeira** 💼📊
