@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFC Analyzer - Teste Local</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .upload-section {
+            text-align: center;
+            padding: 40px;
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-section:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+        
+        .upload-section.dragover {
+            border-color: #764ba2;
+            background: #e8ebff;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .upload-section h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .upload-section p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .file-info.show {
+            display: block;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .results {
+            display: none;
+        }
+        
+        .results.show {
+            display: block;
+        }
+        
+        .dfc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .dfc-table th,
+        .dfc-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .dfc-table th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .dfc-table tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .positive {
+            color: #4caf50;
+            font-weight: 600;
+        }
+        
+        .negative {
+            color: #f44336;
+            font-weight: 600;
+        }
+        
+        .analysis-box {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        .warning {
+            background: #fff3e0;
+            color: #e65100;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 DFC Analyzer</h1>
+            <p>Análise Inteligente de Demonstração de Fluxo de Caixa</p>
+        </div>
+
+        <div class="card">
+            <div class="warning">
+                ⚠️ <strong>Versão de Teste Local</strong><br>
+                Esta é uma versão simplificada para teste. Para funcionalidade completa, acesse a versão online.
+            </div>
+
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-icon">📄</div>
+                <h2>Envie seu arquivo PDF</h2>
+                <p>Arraste e solte ou clique para selecionar</p>
+                <p style="font-size: 0.9rem; color: #999;">Contas a Pagar e Contas a Receber</p>
+                <input type="file" id="fileInput" accept=".pdf" multiple>
+                <button class="btn" onclick="document.getElementById('fileInput').click()">
+                    Selecionar Arquivos
+                </button>
+            </div>
+
+            <div class="file-info" id="fileInfo">
+                <strong>✅ Arquivos selecionados:</strong>
+                <div id="fileList"></div>
+                <button class="btn" onclick="processFiles()" style="margin-top: 15px;">
+                    Analisar Arquivos
+                </button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processando arquivos...</p>
+            </div>
+
+            <div class="error" id="error"></div>
+        </div>
+
+        <div class="results" id="results">
+            <div class="card">
+                <h2>📈 Demonstração de Fluxo de Caixa</h2>
+                <div id="dfcContent"></div>
+            </div>
+
+            <div class="card">
+                <h2>🤖 Análise Inteligente</h2>
+                <div class="analysis-box" id="analysisContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadSection = document.getElementById('uploadSection');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileList = document.getElementById('fileList');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const results = document.getElementById('results');
+        
+        let selectedFiles = [];
+
+        // Drag and drop
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        uploadSection.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'BUTTON') {
+                fileInput.click();
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            selectedFiles = Array.from(files);
+            if (selectedFiles.length > 0) {
+                fileList.innerHTML = selectedFiles.map(f => `<p>📄 ${f.name}</p>`).join('');
+                fileInfo.classList.add('show');
+                error.classList.remove('show');
+            }
+        }
+
+        async function processFiles() {
+            if (selectedFiles.length === 0) {
+                showError('Por favor, selecione pelo menos um arquivo PDF.');
+                return;
+            }
+
+            loading.classList.add('show');
+            fileInfo.classList.remove('show');
+            results.classList.remove('show');
+            error.classList.remove('show');
+
+            // Simular processamento (em produção, isso faria upload real)
+            setTimeout(() => {
+                loading.classList.remove('show');
+                showError('⚠️ Esta é uma versão de teste local. Para processar arquivos PDF reais, você precisa:<br><br>' +
+                    '1. Instalar Node.js e as dependências do projeto<br>' +
+                    '2. Executar o servidor Next.js com "npm run dev"<br>' +
+                    '3. Ou acessar a versão online no Vercel<br><br>' +
+                    'Mostrando dados de exemplo abaixo...');
+                
+                // Mostrar dados de exemplo
+                showExampleData();
+            }, 2000);
+        }
+
+        function showExampleData() {
+            const exampleDFC = {
+                receitas: {
+                    total: 150000,
+                    porCategoria: {
+                        'Vendas': 100000,
+                        'Serviços': 50000
+                    }
+                },
+                despesas: {
+                    total: 120000,
+                    porCategoria: {
+                        'Salários': 60000,
+                        'Aluguel': 30000,
+                        'Fornecedores': 30000
+                    }
+                },
+                saldo: 30000
+            };
+
+            displayDFC(exampleDFC);
+            displayAnalysis(exampleDFC);
+            results.classList.add('show');
+        }
+
+        function displayDFC(data) {
+            const dfcContent = document.getElementById('dfcContent');
+            
+            let html = '<table class="dfc-table">';
+            html += '<thead><tr><th>Categoria</th><th>Valor</th></tr></thead>';
+            html += '<tbody>';
+            
+            html += '<tr><td colspan="2"><strong>RECEITAS</strong></td></tr>';
+            for (const [cat, val] of Object.entries(data.receitas.porCategoria)) {
+                html += `<tr><td>${cat}</td><td class="positive">${formatCurrency(val)}</td></tr>`;
+            }
+            html += `<tr><td><strong>Total Receitas</strong></td><td class="positive"><strong>${formatCurrency(data.receitas.total)}</strong></td></tr>`;
+            
+            html += '<tr><td colspan="2"><strong>DESPESAS</strong></td></tr>';
+            for (const [cat, val] of Object.entries(data.despesas.porCategoria)) {
+                html += `<tr><td>${cat}</td><td class="negative">${formatCurrency(val)}</td></tr>`;
+            }
+            html += `<tr><td><strong>Total Despesas</strong></td><td class="negative"><strong>${formatCurrency(data.despesas.total)}</strong></td></tr>`;
+            
+            html += `<tr style="background: #f0f0f0;"><td><strong>SALDO FINAL</strong></td><td class="${data.saldo >= 0 ? 'positive' : 'negative'}"><strong>${formatCurrency(data.saldo)}</strong></td></tr>`;
+            
+            html += '</tbody></table>';
+            
+            dfcContent.innerHTML = html;
+        }
+
+        function displayAnalysis(data) {
+            const analysisContent = document.getElementById('analysisContent');
+            
+            const margemLucro = ((data.saldo / data.receitas.total) * 100).toFixed(1);
+            const percentualDespesas = ((data.despesas.total / data.receitas.total) * 100).toFixed(1);
+            
+            let analysis = `📊 ANÁLISE FINANCEIRA INTELIGENTE (EXEMPLO)
+
+═══════════════════════════════════════════════════════════
+
+1️⃣ SITUAÇÃO GERAL
+BOA - Margem de lucro adequada
+
+• Saldo Final: ${formatCurrency(data.saldo)} ✅
+• Margem de Lucro: ${margemLucro}%
+• Despesas representam ${percentualDespesas}% das receitas
+
+═══════════════════════════════════════════════════════════
+
+2️⃣ ANÁLISE DE RECEITAS
+Total: ${formatCurrency(data.receitas.total)}
+
+• Maior fonte: Vendas (66.7% do total)
+  Valor: ${formatCurrency(100000)}
+
+✅ Boa diversificação: 2 fontes de receita
+
+═══════════════════════════════════════════════════════════
+
+3️⃣ ANÁLISE DE DESPESAS
+Total: ${formatCurrency(data.despesas.total)}
+
+• Maior despesa: Salários (50.0% do total)
+  Valor: ${formatCurrency(60000)}
+
+⚠️ ATENÇÃO: Esta categoria representa mais de 40% das despesas
+   Avalie possibilidades de otimização
+
+✅ Despesas controladas (${percentualDespesas}% das receitas)
+
+═══════════════════════════════════════════════════════════
+
+4️⃣ RECOMENDAÇÕES ESTRATÉGICAS
+
+1. 📊 Implementar controle mensal de fluxo de caixa
+2. 🎯 Estabelecer metas de redução de custos
+3. 💡 Buscar oportunidades de aumento de receita
+
+═══════════════════════════════════════════════════════════
+
+💡 Esta é uma análise de exemplo. Para análise real dos seus dados,
+   acesse a versão completa do sistema.`;
+            
+            analysisContent.textContent = analysis;
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { 
+                style: 'currency', 
+                currency: 'BRL' 
+            }).format(value);
+        }
+
+        function showError(message) {
+            error.innerHTML = message;
+            error.classList.add('show');
+        }
+    </script>
+</body>
+</html>

@@ -56,7 +56,8 @@ Total: ${formatCurrency(receitas.total)}
 
   // Análise de receitas
   if (maiorReceita) {
-    const percentual = ((maiorReceita[1] as number / receitas.total) * 100).toFixed(1);
+    const percentualNum = (maiorReceita[1] as number / receitas.total) * 100;
+    const percentual = percentualNum.toFixed(1);
     analise += `• Maior fonte: ${maiorReceita[0]} (${percentual}% do total)\n`;
     analise += `  Valor: ${formatCurrency(maiorReceita[1] as number)}\n\n`;
   }
@@ -78,11 +79,12 @@ Total: ${formatCurrency(despesas.total)}
 
   // Análise de despesas
   if (maiorDespesa) {
-    const percentual = ((maiorDespesa[1] as number / despesas.total) * 100).toFixed(1);
+    const percentualNum = (maiorDespesa[1] as number / despesas.total) * 100;
+    const percentual = percentualNum.toFixed(1);
     analise += `• Maior despesa: ${maiorDespesa[0]} (${percentual}% do total)\n`;
     analise += `  Valor: ${formatCurrency(maiorDespesa[1] as number)}\n\n`;
     
-    if (percentual > 40) {
+    if (percentualNum > 40) {
       analise += `⚠️ ATENÇÃO: Esta categoria representa mais de 40% das despesas\n`;
       analise += `   Avalie possibilidades de otimização\n\n`;
     }
