@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import UploadSection from '@/components/UploadSection';
 import ManualInput from '@/components/ManualInput';
+import GoogleSheetsInput from '@/components/GoogleSheetsInput';
 import DFCResults from '@/components/DFCResults';
 import AIAnalysis from '@/components/AIAnalysis';
 import Charts from '@/components/Charts';
@@ -10,7 +11,7 @@ import Charts from '@/components/Charts';
 export default function Home() {
   const [dfcData, setDfcData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'upload' | 'manual'>('upload');
+  const [activeTab, setActiveTab] = useState<'upload' | 'manual' | 'sheets'>('upload');
 
   const handleAnalysis = (data: any) => {
     setDfcData(data);
@@ -50,11 +51,11 @@ export default function Home() {
         {!dfcData ? (
           <div>
             {/* Tabs */}
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-center mb-8 overflow-x-auto">
               <div className="inline-flex bg-white rounded-2xl shadow-lg p-1 border border-gray-200">
                 <button
                   onClick={() => setActiveTab('upload')}
-                  className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                  className={`px-4 md:px-6 py-3 rounded-xl font-semibold transition-all whitespace-nowrap ${
                     activeTab === 'upload'
                       ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
                       : 'text-gray-600 hover:text-gray-900'
@@ -64,12 +65,27 @@ export default function Home() {
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
-                    <span>Upload Excel/PDF</span>
+                    <span>Excel/PDF</span>
+                  </span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('sheets')}
+                  className={`px-4 md:px-6 py-3 rounded-xl font-semibold transition-all whitespace-nowrap ${
+                    activeTab === 'sheets'
+                      ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-md'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <span className="flex items-center space-x-2">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+                    </svg>
+                    <span>Google Sheets</span>
                   </span>
                 </button>
                 <button
                   onClick={() => setActiveTab('manual')}
-                  className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                  className={`px-4 md:px-6 py-3 rounded-xl font-semibold transition-all whitespace-nowrap ${
                     activeTab === 'manual'
                       ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
                       : 'text-gray-600 hover:text-gray-900'
@@ -79,16 +95,20 @@ export default function Home() {
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
-                    <span>Entrada Manual</span>
+                    <span>Manual</span>
                   </span>
                 </button>
               </div>
             </div>
 
             {/* Content based on active tab */}
-            {activeTab === 'upload' ? (
+            {activeTab === 'upload' && (
               <UploadSection onAnalysis={handleAnalysis} setLoading={setLoading} loading={loading} />
-            ) : (
+            )}
+            {activeTab === 'sheets' && (
+              <GoogleSheetsInput onAnalysis={handleAnalysis} setLoading={setLoading} />
+            )}
+            {activeTab === 'manual' && (
               <ManualInput onAnalysis={handleAnalysis} setLoading={setLoading} />
             )}
           </div>
@@ -124,7 +144,7 @@ export default function Home() {
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <p className="text-sm text-gray-600">
-                DFC Analyzer v1.1 - Sistema Online
+                DFC Analyzer v1.2 - Sistema Online
               </p>
             </div>
             <div className="flex items-center space-x-6 text-sm text-gray-500">
