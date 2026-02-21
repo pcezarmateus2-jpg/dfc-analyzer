@@ -11,8 +11,10 @@ function analisarFluxoCaixa(data: any): string {
   const { receitas, despesas, saldo } = data;
   
   // Cálculos
-  const margemLucro = ((saldo / receitas.total) * 100).toFixed(1);
-  const percentualDespesas = ((despesas.total / receitas.total) * 100).toFixed(1);
+  const margemLucroNum = (saldo / receitas.total) * 100;
+  const margemLucro = margemLucroNum.toFixed(1);
+  const percentualDespesasNum = (despesas.total / receitas.total) * 100;
+  const percentualDespesas = percentualDespesasNum.toFixed(1);
   const saldoPositivo = saldo >= 0;
   
   // Encontrar maior receita e despesa
@@ -23,11 +25,11 @@ function analisarFluxoCaixa(data: any): string {
   
   // Análise de saúde financeira
   let saudeFinanceira = '';
-  if (margemLucro > 20) {
+  if (margemLucroNum > 20) {
     saudeFinanceira = 'EXCELENTE - Margem de lucro muito saudável';
-  } else if (margemLucro > 10) {
+  } else if (margemLucroNum > 10) {
     saudeFinanceira = 'BOA - Margem de lucro adequada';
-  } else if (margemLucro > 0) {
+  } else if (margemLucroNum > 0) {
     saudeFinanceira = 'REGULAR - Margem de lucro baixa, atenção necessária';
   } else {
     saudeFinanceira = 'CRÍTICA - Despesas superiores às receitas';
@@ -86,10 +88,10 @@ Total: ${formatCurrency(despesas.total)}
     }
   }
 
-  if (percentualDespesas > 90) {
+  if (percentualDespesasNum > 90) {
     analise += `🔴 CRÍTICO: Despesas muito altas (${percentualDespesas}% das receitas)\n`;
     analise += `   Ação urgente necessária para reduzir custos\n\n`;
-  } else if (percentualDespesas > 80) {
+  } else if (percentualDespesasNum > 80) {
     analise += `⚠️ ATENÇÃO: Despesas elevadas (${percentualDespesas}% das receitas)\n`;
     analise += `   Recomenda-se revisar e otimizar custos\n\n`;
   } else {
@@ -113,7 +115,7 @@ Total: ${formatCurrency(despesas.total)}
     recomendacoes.push('📈 Diversificar fontes de receita para reduzir dependência');
   }
   
-  if (percentualDespesas > 80) {
+  if (percentualDespesasNum > 80) {
     recomendacoes.push('✂️ Revisar e reduzir despesas operacionais em 10-15%');
   }
   
@@ -168,7 +170,7 @@ Total: ${formatCurrency(despesas.total)}
 
 `;
 
-  if (saldo > 0 && parseFloat(margemLucro) > 15) {
+  if (saldo > 0 && margemLucroNum > 15) {
     analise += `Situação financeira SAUDÁVEL. Continue monitorando e busque
 oportunidades de crescimento mantendo o controle de custos.`;
   } else if (saldo > 0) {
