@@ -132,7 +132,7 @@ export const userManagement = {
       id: newUser.id,
       email: newUser.email,
       name: newUser.name,
-      role: newUser.role,
+      role: newUser.role as 'user',
       active: newUser.active,
       createdAt: newUser.createdAt
     };
