@@ -1,29 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pdf from 'pdf-parse';
 
-// Função para extrair valores monetários do texto
-function extrairValores(texto: string): number[] {
-  // Padrões para valores em reais: R$ 1.234,56 ou 1.234,56 ou 1234,56
-  const padroes = [
-    /R\$\s*(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)/g,
-    /(\d{1,3}(?:\.\d{3})*,\d{2})/g,
-    /(\d+,\d{2})/g
-  ];
+// Função para extrair valores monetários do texto com contexto
+function extrairValoresComContexto(texto: string): Array<{ valor: number; linha: string }> {
+  const linhas = texto.split('\n');
+  const valoresComContexto: Array<{ valor: number; linha: string }> = [];
   
-  const valores: number[] = [];
+  // Padrões mais específicos para valores monetários
+  const padraoValor = /(?:R\$\s*)?(\d{1,3}(?:\.\d{3})*,\d{2})/g;
   
-  for (const padrao of padroes) {
+  for (const linha of linhas) {
+    const linhaLimpa = linha.trim();
+    if (!linhaLimpa) continue;
+    
     let match;
-    while ((match = padrao.exec(texto)) !== null) {
+    padraoValor.lastIndex = 0; // Reset regex
+    
+    while ((match = padraoValor.exec(linhaLimpa)) !== null) {
       const valorStr = match[1].replace(/\./g, '').replace(',', '.');
       const valor = parseFloat(valorStr);
-      if (!isNaN(valor) && valor > 0) {
-        valores.push(valor);
+      
+      // Filtrar valores muito pequenos (provavelmente não são valores monetários)
+      if (!isNaN(valor) && valor >= 0.01 && valor < 10000000) {
+        valoresComContexto.push({ valor, linha: linhaLimpa });
       }
     }
   }
   
-  return valores;
+  return valoresComContexto;
+}
+
+// Função para extrair apenas os valores
+function extrairValores(texto: string): number[] {
+  return extrairValoresComContexto(texto).map(v => v.valor);
 }
 
 // Função para categorizar despesas baseado em palavras-chave
@@ -100,53 +109,39 @@ async function processarPDF(file: File, tipo: 'despesa' | 'receita') {
   const data = await pdf(buffer);
   
   const texto = data.text;
-  const valores = extrairValores(texto);
-  
-  // Dividir texto em linhas para melhor categorização
-  const linhas = texto.split('\n').filter(l => l.trim());
+  const valoresComContexto = extrairValoresComContexto(texto);
   
   const categorias: { [key: string]: number } = {};
   let total = 0;
   
-  // Tentar associar valores com suas categorias
-  valores.forEach((valor, index) => {
-    // Pegar contexto ao redor do valor (linhas próximas)
-    const contexto = linhas.slice(Math.max(0, index - 2), index + 3).join(' ');
-    
+  // Processar cada valor com seu contexto
+  for (const { valor, linha } of valoresComContexto) {
     const categoria = tipo === 'despesa' 
-      ? categorizarDespesa(contexto, valor)
-      : categorizarReceita(contexto, valor);
+      ? categorizarDespesa(linha, valor)
+      : categorizarReceita(linha, valor);
     
     if (!categorias[categoria]) {
       categorias[categoria] = 0;
     }
     categorias[categoria] += valor;
     total += valor;
-  });
+  }
   
-  // Se não encontrou valores, tentar extrair de forma mais agressiva
+  // Se não encontrou valores, retornar informação de debug
   if (total === 0) {
-    // Buscar números que possam ser valores
-    const numerosGerais = texto.match(/\d+[.,]\d{2}/g);
-    if (numerosGerais) {
-      numerosGerais.forEach(num => {
-        const valor = parseFloat(num.replace('.', '').replace(',', '.'));
-        if (!isNaN(valor) && valor > 0 && valor < 1000000) {
-          const categoria = tipo === 'despesa' ? 'Despesas Gerais' : 'Receitas Gerais';
-          if (!categorias[categoria]) {
-            categorias[categoria] = 0;
-          }
-          categorias[categoria] += valor;
-          total += valor;
-        }
-      });
-    }
+    return {
+      total: 0,
+      porCategoria: {},
+      textoExtraido: texto.substring(0, 1000),
+      aviso: 'Nenhum valor monetário foi encontrado no PDF. Verifique se o formato está correto.'
+    };
   }
   
   return {
     total,
     porCategoria: categorias,
-    textoExtraido: texto.substring(0, 500) // Para debug
+    textoExtraido: texto.substring(0, 500),
+    quantidadeValores: valoresComContexto.length
   };
 }
 

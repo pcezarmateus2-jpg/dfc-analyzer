@@ -15,17 +15,29 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      {/* Header Melhorado */}
+      <header className="bg-white shadow-lg border-b-4 border-blue-600">
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">💼 DFC Analyzer</h1>
-              <p className="text-sm text-gray-600 mt-1">Análise de Fluxo de Caixa com IA</p>
+            <div className="flex items-center space-x-4">
+              <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-3 rounded-xl shadow-lg">
+                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  DFC Analyzer
+                </h1>
+                <p className="text-sm text-gray-600 mt-1">Análise Inteligente de Fluxo de Caixa</p>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-500">Powered by OpenAI</p>
+            <div className="hidden md:flex items-center space-x-2 bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-2 rounded-lg border border-blue-200">
+              <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              <span className="text-sm font-semibold text-blue-600">Powered by IA</span>
             </div>
           </div>
         </div>
@@ -37,12 +49,15 @@ export default function Home() {
           <UploadSection onAnalysis={handleAnalysis} setLoading={setLoading} loading={loading} />
         ) : (
           <div className="space-y-6">
-            {/* Botão Voltar */}
+            {/* Botão Voltar Melhorado */}
             <button
               onClick={() => setDfcData(null)}
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+              className="group flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all shadow-md hover:shadow-lg border border-gray-200"
             >
-              ← Nova Análise
+              <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span className="font-semibold">Nova Análise</span>
             </button>
 
             {/* Resultados */}
@@ -57,12 +72,22 @@ export default function Home() {
         )}
       </div>
 
-      {/* Footer */}
-      <footer className="bg-white mt-12 border-t">
-        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-          <p className="text-center text-gray-500 text-sm">
-            DFC Analyzer v1.0 - Análise Financeira Inteligente
-          </p>
+      {/* Footer Melhorado */}
+      <footer className="bg-white mt-12 border-t-2 border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <p className="text-sm text-gray-600">
+                DFC Analyzer v1.0 - Sistema Online
+              </p>
+            </div>
+            <div className="flex items-center space-x-6 text-sm text-gray-500">
+              <span>📊 Análise Financeira</span>
+              <span>🤖 IA Integrada</span>
+              <span>🔒 Seguro</span>
+            </div>
+          </div>
         </div>
       </footer>
     </main>
