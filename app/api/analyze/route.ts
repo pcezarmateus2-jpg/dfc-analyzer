@@ -173,7 +173,11 @@ export async function POST(request: NextRequest) {
       saldo,
       debug: {
         textoContasPagar: despesas.textoExtraido,
-        textoContasReceber: receitas.textoExtraido
+        textoContasReceber: receitas.textoExtraido,
+        quantidadeValoresPagar: despesas.quantidadeValores || 0,
+        quantidadeValoresReceber: receitas.quantidadeValores || 0,
+        avisoContasPagar: despesas.aviso,
+        avisoContasReceber: receitas.aviso
       }
     };
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import UploadSection from '@/components/UploadSection';
+import ManualInput from '@/components/ManualInput';
 import DFCResults from '@/components/DFCResults';
 import AIAnalysis from '@/components/AIAnalysis';
 import Charts from '@/components/Charts';
@@ -9,6 +10,7 @@ import Charts from '@/components/Charts';
 export default function Home() {
   const [dfcData, setDfcData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'upload' | 'manual'>('upload');
 
   const handleAnalysis = (data: any) => {
     setDfcData(data);
@@ -46,7 +48,50 @@ export default function Home() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         {!dfcData ? (
-          <UploadSection onAnalysis={handleAnalysis} setLoading={setLoading} loading={loading} />
+          <div>
+            {/* Tabs */}
+            <div className="flex justify-center mb-8">
+              <div className="inline-flex bg-white rounded-2xl shadow-lg p-1 border border-gray-200">
+                <button
+                  onClick={() => setActiveTab('upload')}
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                    activeTab === 'upload'
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <span className="flex items-center space-x-2">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <span>Upload PDF</span>
+                  </span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('manual')}
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                    activeTab === 'manual'
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <span className="flex items-center space-x-2">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <span>Entrada Manual</span>
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Content based on active tab */}
+            {activeTab === 'upload' ? (
+              <UploadSection onAnalysis={handleAnalysis} setLoading={setLoading} loading={loading} />
+            ) : (
+              <ManualInput onAnalysis={handleAnalysis} setLoading={setLoading} />
+            )}
+          </div>
         ) : (
           <div className="space-y-6">
             {/* Botão Voltar Melhorado */}
@@ -79,7 +124,7 @@ export default function Home() {
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <p className="text-sm text-gray-600">
-                DFC Analyzer v1.0 - Sistema Online
+                DFC Analyzer v1.1 - Sistema Online
               </p>
             </div>
             <div className="flex items-center space-x-6 text-sm text-gray-500">
