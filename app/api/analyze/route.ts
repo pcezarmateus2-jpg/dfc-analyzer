@@ -13,8 +13,8 @@ function extrairValores(texto: string): number[] {
   const valores: number[] = [];
   
   for (const padrao of padroes) {
-    const matches = texto.matchAll(padrao);
-    for (const match of matches) {
+    let match;
+    while ((match = padrao.exec(texto)) !== null) {
       const valorStr = match[1].replace(/\./g, '').replace(',', '.');
       const valor = parseFloat(valorStr);
       if (!isNaN(valor) && valor > 0) {
