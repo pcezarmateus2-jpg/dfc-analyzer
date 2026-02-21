@@ -1,0 +1,7 @@
+node_modules
+.next
+.env*.local
+test-pdfs
+*.md
+INICIAR-LOCAL.bat
+test-pdf-reader.js
