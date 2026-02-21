@@ -9,7 +9,7 @@ export default function UploadSection({ onAnalysis, setLoading, loading }: any) 
 
   const handleAnalyze = async () => {
     if (!contasPagar || !contasReceber) {
-      setError('Por favor, envie ambos os arquivos PDF');
+      setError('Por favor, envie ambos os arquivos');
       return;
     }
 
@@ -21,7 +21,11 @@ export default function UploadSection({ onAnalysis, setLoading, loading }: any) 
       formData.append('contasPagar', contasPagar);
       formData.append('contasReceber', contasReceber);
 
-      const response = await fetch('/api/analyze', {
+      // Detectar tipo de arquivo e usar a API apropriada
+      const isExcel = contasPagar.name.endsWith('.xlsx') || contasPagar.name.endsWith('.xls');
+      const apiUrl = isExcel ? '/api/analyze-excel' : '/api/analyze';
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         body: formData,
       });
@@ -55,7 +59,7 @@ export default function UploadSection({ onAnalysis, setLoading, loading }: any) 
             Envie seus Relatórios Financeiros
           </h2>
           <p className="text-gray-600 text-lg">
-            Faça upload dos PDFs de contas a pagar e receber para análise automática
+            Faça upload dos arquivos Excel ou PDF de contas a pagar e receber
           </p>
         </div>
 
@@ -71,15 +75,15 @@ export default function UploadSection({ onAnalysis, setLoading, loading }: any) 
               </div>
             </div>
             <h3 className="text-xl font-bold mb-2 text-red-700">Contas a Pagar</h3>
-            <p className="text-sm text-gray-600 mb-6">Relatório de despesas e pagamentos</p>
+            <p className="text-sm text-gray-600 mb-6">Excel ou PDF de despesas</p>
             <label className="cursor-pointer inline-flex items-center space-x-2 bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 rounded-xl hover:from-red-700 hover:to-red-800 transition-all shadow-md hover:shadow-lg font-semibold">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              <span>{contasPagar ? 'Alterar PDF' : 'Selecionar PDF'}</span>
+              <span>{contasPagar ? 'Alterar Arquivo' : 'Selecionar Arquivo'}</span>
               <input
                 type="file"
-                accept=".pdf"
+                accept=".pdf,.xlsx,.xls"
                 onChange={(e) => setContasPagar(e.target.files?.[0] || null)}
                 className="hidden"
               />
@@ -106,15 +110,15 @@ export default function UploadSection({ onAnalysis, setLoading, loading }: any) 
               </div>
             </div>
             <h3 className="text-xl font-bold mb-2 text-green-700">Contas a Receber</h3>
-            <p className="text-sm text-gray-600 mb-6">Relatório de receitas e recebimentos</p>
+            <p className="text-sm text-gray-600 mb-6">Excel ou PDF de receitas</p>
             <label className="cursor-pointer inline-flex items-center space-x-2 bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-xl hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg font-semibold">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              <span>{contasReceber ? 'Alterar PDF' : 'Selecionar PDF'}</span>
+              <span>{contasReceber ? 'Alterar Arquivo' : 'Selecionar Arquivo'}</span>
               <input
                 type="file"
-                accept=".pdf"
+                accept=".pdf,.xlsx,.xls"
                 onChange={(e) => setContasReceber(e.target.files?.[0] || null)}
                 className="hidden"
               />
@@ -176,7 +180,7 @@ export default function UploadSection({ onAnalysis, setLoading, loading }: any) 
             </svg>
             <div>
               <p className="text-sm font-semibold text-blue-900">Extração Automática</p>
-              <p className="text-xs text-blue-700 mt-1">Valores extraídos automaticamente dos PDFs</p>
+              <p className="text-xs text-blue-700 mt-1">Suporta Excel (.xlsx) e PDF</p>
             </div>
           </div>
           <div className="flex items-start space-x-3 p-4 bg-indigo-50 rounded-xl">

@@ -1,28 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pdf from 'pdf-parse';
 
-// Função para extrair valores monetários do texto com contexto
-function extrairValoresComContexto(texto: string): Array<{ valor: number; linha: string }> {
+// Função para extrair valores monetários do texto com contexto estruturado
+function extrairValoresComContexto(texto: string): Array<{ valor: number; linha: string; loja?: string; conta?: string }> {
   const linhas = texto.split('\n');
-  const valoresComContexto: Array<{ valor: number; linha: string }> = [];
+  const valoresComContexto: Array<{ valor: number; linha: string; loja?: string; conta?: string }> = [];
   
-  // Padrões mais específicos para valores monetários
+  // Padrão para valores monetários
   const padraoValor = /(?:R\$\s*)?(\d{1,3}(?:\.\d{3})*,\d{2})/g;
   
   for (const linha of linhas) {
     const linhaLimpa = linha.trim();
     if (!linhaLimpa) continue;
     
+    // Tentar extrair formato estruturado: Loja | Conta | Valor
+    // Exemplos: "Loja A    Salários    R$ 1.000,00"
+    //           "Matriz   Aluguel     2.500,00"
+    const partes = linhaLimpa.split(/\s{2,}|\t+/); // Split por múltiplos espaços ou tabs
+    
     let match;
-    padraoValor.lastIndex = 0; // Reset regex
+    padraoValor.lastIndex = 0;
     
     while ((match = padraoValor.exec(linhaLimpa)) !== null) {
       const valorStr = match[1].replace(/\./g, '').replace(',', '.');
       const valor = parseFloat(valorStr);
       
-      // Filtrar valores muito pequenos (provavelmente não são valores monetários)
+      // Filtrar valores válidos
       if (!isNaN(valor) && valor >= 0.01 && valor < 10000000) {
-        valoresComContexto.push({ valor, linha: linhaLimpa });
+        let loja = '';
+        let conta = '';
+        
+        // Se temos 3 ou mais partes, provavelmente é: Loja, Conta, Valor
+        if (partes.length >= 3) {
+          loja = partes[0].trim();
+          conta = partes[1].trim();
+        } else if (partes.length === 2) {
+          // Se temos 2 partes, pode ser: Conta, Valor
+          conta = partes[0].trim();
+        } else {
+          // Tentar extrair conta da linha antes do valor
+          const textoAntes = linhaLimpa.substring(0, match.index).trim();
+          conta = textoAntes || 'Não categorizado';
+        }
+        
+        valoresComContexto.push({ 
+          valor, 
+          linha: linhaLimpa,
+          loja: loja || undefined,
+          conta: conta || 'Não categorizado'
+        });
       }
     }
   }
@@ -112,18 +138,29 @@ async function processarPDF(file: File, tipo: 'despesa' | 'receita') {
   const valoresComContexto = extrairValoresComContexto(texto);
   
   const categorias: { [key: string]: number } = {};
+  const porLoja: { [key: string]: number } = {};
   let total = 0;
   
   // Processar cada valor com seu contexto
-  for (const { valor, linha } of valoresComContexto) {
+  for (const { valor, linha, loja, conta } of valoresComContexto) {
+    // Categorizar por conta
     const categoria = tipo === 'despesa' 
-      ? categorizarDespesa(linha, valor)
-      : categorizarReceita(linha, valor);
+      ? categorizarDespesa(conta || linha, valor)
+      : categorizarReceita(conta || linha, valor);
     
     if (!categorias[categoria]) {
       categorias[categoria] = 0;
     }
     categorias[categoria] += valor;
+    
+    // Agrupar por loja se disponível
+    if (loja) {
+      if (!porLoja[loja]) {
+        porLoja[loja] = 0;
+      }
+      porLoja[loja] += valor;
+    }
+    
     total += valor;
   }
   
@@ -132,6 +169,7 @@ async function processarPDF(file: File, tipo: 'despesa' | 'receita') {
     return {
       total: 0,
       porCategoria: {},
+      porLoja: {},
       textoExtraido: texto.substring(0, 1000),
       aviso: 'Nenhum valor monetário foi encontrado no PDF. Verifique se o formato está correto.'
     };
@@ -140,6 +178,7 @@ async function processarPDF(file: File, tipo: 'despesa' | 'receita') {
   return {
     total,
     porCategoria: categorias,
+    porLoja: Object.keys(porLoja).length > 0 ? porLoja : undefined,
     textoExtraido: texto.substring(0, 500),
     quantidadeValores: valoresComContexto.length
   };
@@ -164,11 +203,13 @@ export async function POST(request: NextRequest) {
     const resultado = {
       receitas: {
         total: receitas.total,
-        porCategoria: receitas.porCategoria
+        porCategoria: receitas.porCategoria,
+        porLoja: receitas.porLoja
       },
       despesas: {
         total: despesas.total,
-        porCategoria: despesas.porCategoria
+        porCategoria: despesas.porCategoria,
+        porLoja: despesas.porLoja
       },
       saldo,
       debug: {
