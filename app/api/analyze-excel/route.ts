@@ -13,7 +13,7 @@ async function processarExcel(file: File): Promise<LinhaExcel[]> {
   const buffer = Buffer.from(arrayBuffer);
   
   const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(buffer);
+  await workbook.xlsx.load(buffer as any);
   
   const worksheet = workbook.worksheets[0]; // Primeira aba
   const linhas: LinhaExcel[] = [];
