@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/lib/auth';
-import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,6 +10,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Inicializar usuário master
+    auth.init();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,21 +98,27 @@ export default function LoginPage() {
           </form>
 
           {/* Link para cadastro */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-600 text-sm">
-              Não tem uma conta?{' '}
-              <Link href="/register" className="text-blue-600 font-semibold hover:text-blue-700">
-                Criar conta
-              </Link>
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-sm text-blue-900 font-semibold mb-2">
+              👤 Credenciais do Administrador:
+            </p>
+            <p className="text-xs text-blue-700">
+              Email: <code className="bg-white px-2 py-1 rounded">admin@dfcanalyzer.com</code>
+            </p>
+            <p className="text-xs text-blue-700 mt-1">
+              Senha: <code className="bg-white px-2 py-1 rounded">admin123</code>
+            </p>
+            <p className="text-xs text-blue-600 mt-2">
+              ⚠️ Altere a senha após o primeiro acesso
             </p>
           </div>
         </div>
 
         {/* Link para voltar */}
         <div className="mt-6 text-center">
-          <Link href="/" className="text-gray-600 text-sm hover:text-gray-900">
-            ← Voltar para início
-          </Link>
+          <p className="text-gray-600 text-sm">
+            Apenas usuários cadastrados pelo administrador podem acessar o sistema
+          </p>
         </div>
       </div>
     </div>
