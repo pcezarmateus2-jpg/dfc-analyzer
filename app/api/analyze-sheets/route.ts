@@ -43,9 +43,9 @@ async function buscarDadosSheet(url: string): Promise<LinhaSheet[]> {
       const colunas = linha.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
       
       if (colunas.length >= 3) {
-        const loja = colunas[0].replace(/"/g, '').trim();
-        const conta = colunas[1].replace(/"/g, '').trim();
-        const valorStr = colunas[2].replace(/"/g, '').trim();
+        const loja = (colunas[0] || '').replace(/"/g, '').trim();
+        const conta = (colunas[1] || '').replace(/"/g, '').trim();
+        const valorStr = (colunas[2] || '').replace(/"/g, '').trim();
         
         // Converter valor para número
         const valorLimpo = valorStr.replace(/R\$\s*/g, '').replace(/\./g, '').replace(',', '.');
