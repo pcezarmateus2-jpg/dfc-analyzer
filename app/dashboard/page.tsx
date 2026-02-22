@@ -289,8 +289,20 @@ export default function DashboardPage() {
                 </thead>
                 <tbody>
                   {savedAnalyses.map((analysis) => (
-                    <tr key={analysis.id} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-3 px-4 font-semibold text-gray-900">{analysis.periodo}</td>
+                    <tr 
+                      key={analysis.id} 
+                      className="border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition group"
+                      onClick={() => router.push(`/analise/${analysis.id}`)}
+                    >
+                      <td className="py-3 px-4 font-semibold text-gray-900 group-hover:text-blue-700 transition">
+                        <div className="flex items-center space-x-2">
+                          <svg className="w-4 h-4 text-blue-600 opacity-0 group-hover:opacity-100 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          <span>{analysis.periodo}</span>
+                        </div>
+                      </td>
                       <td className="py-3 px-4 text-gray-600">
                         {analysis.dataInicio ? new Date(analysis.dataInicio).toLocaleDateString('pt-BR') : '-'}
                       </td>
@@ -314,12 +326,20 @@ export default function DashboardPage() {
                         {formatDate(analysis.createdAt)}
                       </td>
                       <td className="py-3 px-4">
-                        <button
-                          onClick={() => handleDeleteAnalysis(analysis.id)}
-                          className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm font-semibold hover:bg-red-200 transition"
-                        >
-                          Excluir
-                        </button>
+                        <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={() => router.push(`/analise/${analysis.id}`)}
+                            className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm font-semibold hover:bg-blue-200 transition"
+                          >
+                            Ver Detalhes
+                          </button>
+                          <button
+                            onClick={() => handleDeleteAnalysis(analysis.id)}
+                            className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm font-semibold hover:bg-red-200 transition"
+                          >
+                            Excluir
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
