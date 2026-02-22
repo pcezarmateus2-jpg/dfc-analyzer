@@ -150,6 +150,20 @@ export default function DashboardPage() {
                     </svg>
                     <span className="text-gray-700 font-medium">Nova Análise</span>
                   </button>
+                  {currentUser?.role === 'master' && (
+                    <button
+                      onClick={() => {
+                        router.push('/usuarios');
+                        setShowMenu(false);
+                      }}
+                      className="w-full px-4 py-2 text-left hover:bg-purple-50 transition flex items-center space-x-2"
+                    >
+                      <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                      <span className="text-gray-700 font-medium">Gerenciar Usuários</span>
+                    </button>
+                  )}
                   <button
                     onClick={() => {
                       handleLogout();
@@ -194,108 +208,6 @@ export default function DashboardPage() {
             <span>Nova Análise</span>
           </Link>
         </div>
-
-        {/* Gerenciamento de Usuários (apenas MASTER) */}
-        {currentUser.role === 'master' && (
-          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Gerenciar Usuários</h2>
-              <button
-                onClick={() => setShowAddUser(!showAddUser)}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-              >
-                {showAddUser ? 'Cancelar' : '+ Novo Usuário'}
-              </button>
-            </div>
-
-            {/* Formulário Adicionar Usuário */}
-            {showAddUser && (
-              <div className="mb-6 p-6 bg-gray-50 rounded-xl border-2 border-gray-200">
-                <h3 className="font-semibold text-gray-900 mb-4">Adicionar Novo Usuário</h3>
-                <div className="grid md:grid-cols-3 gap-4 mb-4">
-                  <input
-                    type="text"
-                    placeholder="Nome"
-                    value={newUserName}
-                    onChange={(e) => setNewUserName(e.target.value)}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 outline-none"
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    value={newUserEmail}
-                    onChange={(e) => setNewUserEmail(e.target.value)}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 outline-none"
-                  />
-                  <input
-                    type="password"
-                    placeholder="Senha"
-                    value={newUserPassword}
-                    onChange={(e) => setNewUserPassword(e.target.value)}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 outline-none"
-                  />
-                </div>
-                <button
-                  onClick={handleAddUser}
-                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                >
-                  Criar Usuário
-                </button>
-              </div>
-            )}
-
-            {/* Lista de Usuários */}
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2 border-gray-200">
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Nome</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Tipo</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((user) => (
-                    <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-3 px-4">{user.name}</td>
-                      <td className="py-3 px-4">{user.email}</td>
-                      <td className="py-3 px-4">
-                        <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                          user.role === 'master' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
-                        }`}>
-                          {user.role === 'master' ? 'MASTER' : 'Usuário'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                          user.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                        }`}>
-                          {user.active ? 'Ativo' : 'Inativo'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        {user.role !== 'master' && (
-                          <button
-                            onClick={() => handleToggleActive(user.id)}
-                            className={`px-3 py-1 rounded text-sm font-semibold ${
-                              user.active 
-                                ? 'bg-red-100 text-red-700 hover:bg-red-200' 
-                                : 'bg-green-100 text-green-700 hover:bg-green-200'
-                            }`}
-                          >
-                            {user.active ? 'Inativar' : 'Ativar'}
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
 
         {/* Histórico de Análises */}
         <div className="bg-white rounded-2xl shadow-xl p-8">

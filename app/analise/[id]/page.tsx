@@ -6,6 +6,7 @@ import { auth, analyses, SavedAnalysis } from '@/lib/auth';
 import DFCResults from '@/components/DFCResults';
 import Charts from '@/components/Charts';
 import AIAnalysis from '@/components/AIAnalysis';
+import ExportPDF from '@/components/ExportPDF';
 
 export default function AnalysisViewPage() {
   const router = useRouter();
@@ -142,37 +143,48 @@ export default function AnalysisViewPage() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="space-y-6">
-          {/* Informações da Análise */}
-          <div className="bg-white rounded-2xl shadow-xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Informações da Análise</h2>
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-600 font-medium mb-1">Período</p>
-                <p className="text-lg font-bold text-blue-900">{analysis.periodo}</p>
-              </div>
-              {analysis.dataInicio && (
-                <div className="p-4 bg-green-50 rounded-lg">
-                  <p className="text-sm text-green-600 font-medium mb-1">Data Início</p>
-                  <p className="text-lg font-bold text-green-900">{formatDate(analysis.dataInicio)}</p>
-                </div>
-              )}
-              {analysis.dataFim && (
-                <div className="p-4 bg-purple-50 rounded-lg">
-                  <p className="text-sm text-purple-600 font-medium mb-1">Data Fim</p>
-                  <p className="text-lg font-bold text-purple-900">{formatDate(analysis.dataFim)}</p>
-                </div>
-              )}
-            </div>
+          {/* Botão Exportar PDF */}
+          <div className="flex justify-end">
+            <ExportPDF 
+              contentId="saved-analysis-content" 
+              fileName={`DFC-${analysis.periodo.replace(/\s+/g, '-')}`} 
+            />
           </div>
 
-          {/* Resultados DFC */}
-          <DFCResults data={analysis.data} />
-          
-          {/* Gráficos */}
-          <Charts data={analysis.data} />
-          
-          {/* Análise com IA */}
-          <AIAnalysis data={analysis.data} />
+          {/* Conteúdo para Exportar */}
+          <div id="saved-analysis-content">
+            {/* Informações da Análise */}
+            <div className="bg-white rounded-2xl shadow-xl p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Informações da Análise</h2>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <p className="text-sm text-blue-600 font-medium mb-1">Período</p>
+                  <p className="text-lg font-bold text-blue-900">{analysis.periodo}</p>
+                </div>
+                {analysis.dataInicio && (
+                  <div className="p-4 bg-green-50 rounded-lg">
+                    <p className="text-sm text-green-600 font-medium mb-1">Data Início</p>
+                    <p className="text-lg font-bold text-green-900">{formatDate(analysis.dataInicio)}</p>
+                  </div>
+                )}
+                {analysis.dataFim && (
+                  <div className="p-4 bg-purple-50 rounded-lg">
+                    <p className="text-sm text-purple-600 font-medium mb-1">Data Fim</p>
+                    <p className="text-lg font-bold text-purple-900">{formatDate(analysis.dataFim)}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Resultados DFC */}
+            <DFCResults data={analysis.data} />
+            
+            {/* Gráficos */}
+            <Charts data={analysis.data} />
+            
+            {/* Análise com IA */}
+            <AIAnalysis data={analysis.data} />
+          </div>
         </div>
       </div>
 

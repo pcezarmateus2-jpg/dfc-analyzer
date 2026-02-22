@@ -9,6 +9,7 @@ import GoogleSheetsInput from '@/components/GoogleSheetsInput';
 import DFCResults from '@/components/DFCResults';
 import AIAnalysis from '@/components/AIAnalysis';
 import Charts from '@/components/Charts';
+import ExportPDF from '@/components/ExportPDF';
 
 export default function Home() {
   const router = useRouter();
@@ -116,6 +117,20 @@ export default function Home() {
                       </svg>
                       <span className="text-gray-700 font-medium">Dashboard</span>
                     </button>
+                    {currentUser?.role === 'master' && (
+                      <button
+                        onClick={() => {
+                          router.push('/usuarios');
+                          setShowMenu(false);
+                        }}
+                        className="w-full px-4 py-2 text-left hover:bg-purple-50 transition flex items-center space-x-2"
+                      >
+                        <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <span className="text-gray-700 font-medium">Gerenciar Usuários</span>
+                      </button>
+                    )}
                     <button
                       onClick={() => {
                         handleLogout();
@@ -267,25 +282,32 @@ export default function Home() {
               </div>
             )}
 
-            {/* Botão Voltar Melhorado */}
-            <button
-              onClick={() => setDfcData(null)}
-              className="group flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all shadow-md hover:shadow-lg border border-gray-200"
-            >
-              <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              <span className="font-semibold">Nova Análise</span>
-            </button>
+            {/* Botões de Ação */}
+            <div className="flex flex-wrap gap-4">
+              <button
+                onClick={() => setDfcData(null)}
+                className="group flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all shadow-md hover:shadow-lg border border-gray-200"
+              >
+                <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span className="font-semibold">Nova Análise</span>
+              </button>
 
-            {/* Resultados */}
-            <DFCResults data={dfcData} />
-            
-            {/* Gráficos */}
-            <Charts data={dfcData} />
-            
-            {/* Análise com IA */}
-            <AIAnalysis data={dfcData} />
+              <ExportPDF contentId="analysis-content" fileName={`DFC-Analise-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}`} />
+            </div>
+
+            {/* Conteúdo para Exportar */}
+            <div id="analysis-content">
+              {/* Resultados */}
+              <DFCResults data={dfcData} />
+              
+              {/* Gráficos */}
+              <Charts data={dfcData} />
+              
+              {/* Análise com IA */}
+              <AIAnalysis data={dfcData} />
+            </div>
           </div>
         )}
       </div>
