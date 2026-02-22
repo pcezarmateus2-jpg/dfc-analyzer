@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { auth, analyses } from '@/lib/auth';
 import UploadSection from '@/components/UploadSection';
 import ManualInput from '@/components/ManualInput';
 import GoogleSheetsInput from '@/components/GoogleSheetsInput';
@@ -16,6 +16,10 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'upload' | 'manual' | 'sheets'>('upload');
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [periodo, setPeriodo] = useState('');
+  const [dataInicio, setDataInicio] = useState('');
+  const [dataFim, setDataFim] = useState('');
 
   useEffect(() => {
     const user = auth.getCurrentUser();
@@ -28,6 +32,25 @@ export default function Home() {
 
   const handleAnalysis = (data: any) => {
     setDfcData(data);
+    setShowSaveModal(true);
+  };
+
+  const handleSaveAnalysis = () => {
+    if (!periodo) {
+      alert('Por favor, informe o período da análise');
+      return;
+    }
+
+    try {
+      analyses.save(periodo, dataInicio || undefined, dataFim || undefined, dfcData);
+      setShowSaveModal(false);
+      setPeriodo('');
+      setDataInicio('');
+      setDataFim('');
+      alert('Análise salva com sucesso!');
+    } catch (err: any) {
+      alert('Erro ao salvar análise: ' + err.message);
+    }
   };
 
   const handleLogout = () => {
@@ -150,6 +173,69 @@ export default function Home() {
           </div>
         ) : (
           <div className="space-y-6">
+            {/* Modal de Salvar Análise */}
+            {showSaveModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6">Salvar Análise</h3>
+                  
+                  <div className="space-y-4 mb-6">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Período/Descrição *
+                      </label>
+                      <input
+                        type="text"
+                        value={periodo}
+                        onChange={(e) => setPeriodo(e.target.value)}
+                        placeholder="Ex: Janeiro 2024, Q1 2024, etc."
+                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 outline-none"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Data Início (opcional)
+                      </label>
+                      <input
+                        type="date"
+                        value={dataInicio}
+                        onChange={(e) => setDataInicio(e.target.value)}
+                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 outline-none"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Data Fim (opcional)
+                      </label>
+                      <input
+                        type="date"
+                        value={dataFim}
+                        onChange={(e) => setDataFim(e.target.value)}
+                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-4">
+                    <button
+                      onClick={() => setShowSaveModal(false)}
+                      className="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition font-semibold"
+                    >
+                      Agora Não
+                    </button>
+                    <button
+                      onClick={handleSaveAnalysis}
+                      className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition font-semibold"
+                    >
+                      Salvar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Botão Voltar Melhorado */}
             <button
               onClick={() => setDfcData(null)}
